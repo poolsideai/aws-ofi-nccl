@@ -2568,6 +2568,8 @@ static int reg_mr_ep(nccl_net_ofi_rdma_ep_t *ep, void *data,
 		nccl_net_ofi_rdma_device_rail_t *dev_rail = get_device_rail(device, rail_id);
 		nccl_net_ofi_ep_rail_t *rail = get_rail(ep, rail_id);
 
+		NCCL_OFI_WARN("psdbg: rail %d reg: type %d start: %lX len: %ld",
+			       rail_id, type, data, size);
 		ret = register_rail_mr_buffer(dev_rail->domain, rail->ofi_ep,
 					      dev_id, type, &mr_attr,
 					      &ret_handle->mr[rail_id]);
@@ -2645,6 +2647,8 @@ static int reg_internal_mr_ep(nccl_net_ofi_rdma_ep_t *ep, void *data,
 	assert(NCCL_OFI_IS_PTR_ALIGNED(data, system_page_size));
 	assert(NCCL_OFI_IS_ALIGNED(size, system_page_size));
 
+	NCCL_OFI_WARN("psdbg: internal reg: type %d start: %lX len: %ld (pg_sz %ld)",
+		      type, data, size, system_page_size);
 	return reg_mr_ep(ep, data, size, type, mhandle);
 }
 
@@ -2652,6 +2656,8 @@ static int reg_mr_send_comm(nccl_net_ofi_send_comm_t *send_comm, void *data,
 					      size_t size, int type, void **mhandle)
 {
 	nccl_net_ofi_rdma_ep_t *ep = (nccl_net_ofi_rdma_ep_t *) send_comm->base.ep;
+	NCCL_OFI_WARN("psdbg: send_comm reg: type %d start: %lX len: %ld",
+		      type, data, size);
 	return reg_mr_ep(ep, data, size, type, (nccl_net_ofi_rdma_mr_handle_t **)mhandle);
 }
 
@@ -2659,6 +2665,8 @@ static int reg_mr_recv_comm(nccl_net_ofi_recv_comm_t *recv_comm, void *data,
 					      size_t size, int type, void **mhandle)
 {
 	nccl_net_ofi_rdma_ep_t *ep = (nccl_net_ofi_rdma_ep_t *) recv_comm->base.ep;
+	NCCL_OFI_WARN("psdbg: recv_comm reg: type %d start: %lX len: %ld",
+		      type, data, size);
 	return reg_mr_ep(ep, data, size, type, (nccl_net_ofi_rdma_mr_handle_t **)mhandle);
 }
 
@@ -3261,6 +3269,8 @@ static int alloc_and_reg_flush_buff(nccl_net_ofi_rdma_recv_comm_t *r_comm, int d
 	/* Check if provider requires registration of local buffers */
 	if (local_mr == true) {
 		/* Register flush dummy buffer for provider access */
+		NCCL_OFI_WARN("psdbg:host flushbuf reg: start: %lX len: %ld",
+			       flush_buff->host_buffer, system_page_size);
 		ret = reg_internal_mr_ep((nccl_net_ofi_rdma_ep_t *)r_comm->base.base.ep, flush_buff->host_buffer, system_page_size,
 			  NCCL_PTR_HOST, &mr_handle);
 		if (OFI_UNLIKELY(ret != 0)) {
