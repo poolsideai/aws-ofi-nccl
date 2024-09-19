@@ -2245,7 +2245,7 @@ static int test(nccl_net_ofi_req_t *base_req, int *done, int *size)
 		assert(req->free);
 		req->free(req, true);
 	} else if (OFI_UNLIKELY(req->state == NCCL_OFI_RDMA_REQ_ERROR)) {
-		NCCL_OFI_WARN("Request completed with error");
+		NCCL_OFI_INFO(NCCL_NET, "Request completed with error");
 		ret = -EINVAL;
 		goto exit;
 	}
